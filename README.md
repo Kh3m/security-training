@@ -24,8 +24,11 @@ Each topic gets its own folder, with working code I actually ran and tested myse
         │   ├── 01-sha256-basics.ipynb      # SHA-256 with hashlib, digest vs
         │   │                               # hexdigest, bytes literals, verifying
         │   ├── 02-one-small-change.ipynb   # avalanche effect: one-bit input change
-        │   │                               # flips about half the output bits
-        │   ├── 03-hashing-files.ipynb      # (in progress)
+        │   │                               # flips about half the output bits,
+        │   │                               # encoding vs hashing, toy mixing round
+        │   ├── 03-hashing-files.ipynb      # binary mode, newline="", chunked
+        │   │                               # .update(), file_digest(), verifying
+        │   │                               # a file against a published hash
         │   ├── 04-hash-vs-hmac.ipynb       # (in progress)
         │   └── examples/
         │       └── verify_download.py      # (in progress)
@@ -39,7 +42,7 @@ More top-level folders will be added as I move into other areas, web security, n
 
 ## Setup
 
-The cryptography examples currently use only Python's standard library, `hmac` and `hashlib`, so nothing needs installing to run the scripts.
+The cryptography examples currently use only Python's standard library, `hmac` and `hashlib`, so nothing needs installing to run the scripts. Use Python 3.11 or newer, since some notebooks use `zip(..., strict=True)` (3.10+) and `hashlib.file_digest()` (3.11+).
 
     python cryptography/01-hmac/00-hmac.py
 
@@ -61,11 +64,14 @@ If a later topic needs external packages, they'll go in a `requirements.txt` and
 - Foundations: bits and bytes, why a byte holds 0 to 255, writing numbers in binary and hex with `format()` codes, why one byte is two hex characters
 - Encoding: text vs bytes, Unicode code points and UTF-8, encoding and decoding, why the same text in different encodings hashes differently, and showing bytes as hex or Base64
 - Hashing: SHA-256 with `hashlib`, raw `digest()` vs readable `hexdigest()`, why hash functions need bytes, and verifying a hash with `hmac.compare_digest`, including what a matching hash does not prove (who sent it)
-- Avalanche effect: changing one input bit flips about half of SHA-256's 256 output bits, measured on one pair and averaged over 1,000 messages
+- Avalanche effect: changing one input bit flips about half of SHA-256's 256 output bits, measured on one pair and averaged over 1,000 messages, why encoding changes 1 bit out for 1 bit in while hashing mixes everything, and a toy rotate/XOR/add round showing how one changed bit spreads
+- Hashing files: opening files in binary mode, why text mode on Windows turns `
+` into `
+` and changes the hash (and how `newline=""` fixes it), hashing large files in chunks with `.update()` and the walrus operator, the `hashlib.file_digest()` shortcut (Python 3.11+), verifying a file against a published hash or a `SHA256SUMS` list, checking hashes from the terminal, and why a matching hash still doesn't prove who published the file
 - HMAC: HMAC-SHA256 signing and verification, why the construction prevents length extension attacks, and why constant-time comparison matters
 
 ## Up Next
 
-- Hashing files and hash vs HMAC (notebooks in `02-hashlib/`)
-- Verifying a downloaded file against a published checksum
+- Hash vs HMAC (`02-hashlib/04-hash-vs-hmac.ipynb`)
+- A standalone script for verifying a downloaded file against a published checksum (`02-hashlib/examples/verify_download.py`)
 - Digital signatures
